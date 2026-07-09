@@ -48,7 +48,19 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
-app.use(express.static('../'));
+
+// Serve static files from parent directory
+app.use(express.static('../', {
+  dotfiles: 'allow',
+  etag: true,
+  lastModified: true
+}));
+
+// Serve HTML files
+app.get('*', (req, res) => {
+  const filePath = req.path === '/' ? '/index.html' : req.path;
+  res.sendFile(path.join(__dirname, '..', filePath));
+});
 
 // Auth Middleware
 const authenticateToken = (req, res, next) => {
