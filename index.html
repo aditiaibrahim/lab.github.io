@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratory Unit - Universitas Nusa Putra</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        /* Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            padding: 1rem 0;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e3a8a;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-menu a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-menu a:hover {
+            color: #1e3a8a;
+        }
+
+        .nav-menu .btn-login {
+            background: #1e3a8a;
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 5px;
+        }
+
+        .nav-menu .btn-login:hover {
+            background: #1e40af;
+            color: white;
+        }
+
+        .mobile-menu-toggle {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Hero Section */
+        .hero {
+            margin-top: 80px;
+            padding: 100px 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .btn-primary {
+            display: inline-block;
+            background: white;
+            color: #1e3a8a;
+            padding: 1rem 2rem;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.3s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Services Section */
+        .services {
+            padding: 80px 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 3rem;
+            color: #1e3a8a;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .service-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .service-card i {
+            font-size: 3rem;
+            color: #1e3a8a;
+            margin-bottom: 1rem;
+        }
+
+        .service-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: #1e3a8a;
+        }
+
+        .service-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* Schedule Section */
+        .schedule {
+            padding: 80px 2rem;
+            background: #f8f9fa;
+        }
+
+        .schedule-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .schedule-table {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .schedule-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .schedule-table th {
+            background: #1e3a8a;
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .schedule-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .schedule-table tr:hover {
+            background: #f9fafb;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-approved {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-rejected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Laboratory Section */
+        .laboratory {
+            padding: 80px 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .lab-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .lab-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+
+        .lab-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .lab-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 4rem;
+        }
+
+        .lab-content {
+            padding: 1.5rem;
+        }
+
+        .lab-content h3 {
+            font-size: 1.3rem;
+            color: #1e3a8a;
+            margin-bottom: 0.5rem;
+        }
+
+        .lab-content p {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .btn-secondary {
+            display: inline-block;
+            background: #1e3a8a;
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .btn-secondary:hover {
+            background: #1e40af;
+        }
+
+        /* FAQ Section */
+        .faq {
+            padding: 80px 2rem;
+            background: #f8f9fa;
+        }
+
+        .faq-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .faq-question {
+            padding: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            color: #1e3a8a;
+        }
+
+        .faq-answer {
+            padding: 0 1.5rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s, padding 0.3s;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 500px;
+            padding: 0 1.5rem 1.5rem;
+        }
+
+        .faq-item.active .faq-question i {
+            transform: rotate(180deg);
+        }
+
+        /* Footer */
+        footer {
+            background: #1e3a8a;
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: white;
+                flex-direction: column;
+                padding: 1rem;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            }
+
+            .nav-menu.active {
+                display: flex;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">Laboratory Unit</div>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#schedule">Schedule</a></li>
+                <li><a href="#laboratory">Laboratory</a></li>
+                <li><a href="#faq">FAQ</a></li>
+                <li><a href="login.html" class="btn-login">Login</a></li>
+            </ul>
+            <div class="mobile-menu-toggle" id="mobileMenuToggle">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <h1>Laboratory Unit</h1>
+        <p>Unit under Vice Rector II: Operation, Resource, and Finance</p>
+        <a href="#schedule" class="btn-primary">Schedule your Visit</a>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services" id="services">
+        <h2 class="section-title">Our Services</h2>
+        <div class="services-grid">
+            <div class="service-card">
+                <i class="fas fa-graduation-cap"></i>
+                <h3>Practicum for Students</h3>
+                <p>Praktikum laboratorium untuk mahasiswa dengan panduan dosen yang ahli di bidangnya.</p>
+            </div>
+            <div class="service-card">
+                <i class="fas fa-microscope"></i>
+                <h3>Research Facilities</h3>
+                <p>Fasilitas penelitian lengkap untuk mendukung kegiatan akademik dan penelitian mahasiswa.</p>
+            </div>
+            <div class="service-card">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <h3>Training or Workshop</h3>
+                <p>Pelatihan dan workshop untuk meningkatkan kompetensi mahasiswa dalam bidang teknologi.</p>
+            </div>
+            <div class="service-card">
+                <i class="fas fa-tools"></i>
+                <h3>Laboratory Equipment Rental</h3>
+                <p>Sistem peminjaman peralatan laboratorium untuk keperluan akademik dan penelitian.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Schedule Section -->
+    <section class="schedule" id="schedule">
+        <div class="schedule-container">
+            <h2 class="section-title">Laboratory Schedule</h2>
+            <div class="schedule-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Time Start</th>
+                            <th>Time Finish</th>
+                            <th>User</th>
+                            <th>Course</th>
+                            <th>Laboratory</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scheduleTable">
+                        <!-- Data will be loaded dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Laboratory Section -->
+    <section class="laboratory" id="laboratory">
+        <h2 class="section-title">Our Laboratory</h2>
+        <div class="lab-grid" id="labGrid">
+            <!-- Data will be loaded dynamically -->
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq" id="faq">
+        <div class="faq-container">
+            <h2 class="section-title">Frequently Asked Questions</h2>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>Apa saja fasilitas yang tersedia di laboratorium?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Laboratorium kami dilengkapi dengan peralatan modern seperti komputer, proyektor, kamera DSLR, drone, oscilloscope, dan berbagai peralatan pendukung lainnya untuk mendukung kegiatan praktikum dan penelitian.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>Bagaimana cara booking laboratorium?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Mahasiswa dan dosen dapat melakukan booking laboratorium melalui sistem online dengan memilih laboratorium yang diinginkan, menentukan waktu, dan mengisi form peminjaman. Setelah itu, tunggu persetujuan dari admin.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>Siapa yang bisa menggunakan laboratorium?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Laboratorium dapat digunakan oleh mahasiswa aktif Universitas Nusa Putra, dosen, dan staf pengajar untuk keperluan akademik, penelitian, dan kegiatan pembelajaran.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>Berapa jam operasional laboratorium?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Laboratorium beroperasi dari Senin hingga Jumat, pukul 08:00 - 16:00 WIB. Untuk penggunaan di luar jam operasional, perlu pengajuan khusus dan persetujuan admin.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 Laboratory Unit - Universitas Nusa Putra. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const navMenu = document.getElementById('navMenu');
+
+        mobileMenuToggle.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+        });
+
+        // FAQ accordion
+        const faqItems = document.querySelectorAll('.faq-item');
+        faqItems.forEach(item => {
+            item.querySelector('.faq-question').addEventListener('click', () => {
+                item.classList.toggle('active');
+            });
+        });
+
+        // Load schedules
+        async function loadSchedules() {
+            try {
+                const response = await fetch('http://localhost:3000/api/schedules');
+                const schedules = await response.json();
+                const tbody = document.getElementById('scheduleTable');
+                
+                tbody.innerHTML = schedules.map((schedule, index) => `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${schedule.time_start}</td>
+                        <td>${schedule.time_finish}</td>
+                        <td>${schedule.user_name}</td>
+                        <td>${schedule.mata_kuliah}</td>
+                        <td>${schedule.nama_lab}</td>
+                        <td><span class="status-badge status-${schedule.status}">${schedule.status}</span></td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading schedules:', error);
+            }
+        }
+
+        // Load laboratories
+        async function loadLaboratories() {
+            try {
+                const response = await fetch('http://localhost:3000/api/laboratories');
+                const labs = await response.json();
+                const labGrid = document.getElementById('labGrid');
+                
+                const labIcons = {
+                    'hardware': 'fa-desktop',
+                    'software': 'fa-code',
+                    'language': 'fa-language',
+                    'photography': 'fa-camera',
+                    'electro': 'fa-bolt',
+                    'civil': 'fa-building',
+                    'machine': 'fa-cogs'
+                };
+
+                labGrid.innerHTML = labs.map(lab => {
+                    const icon = labIcons[lab.nama_lab.toLowerCase().split(' ')[0]] || 'fa-flask';
+                    return `
+                        <div class="lab-card">
+                            <div class="lab-image">
+                                <i class="fas ${icon}"></i>
+                            </div>
+                            <div class="lab-content">
+                                <h3>${lab.nama_lab}</h3>
+                                <p>${lab.deskripsi}</p>
+                                <p><strong>Kapasitas:</strong> ${lab.kapasitas} orang</p>
+                                <p><strong>Lokasi:</strong> ${lab.lokasi}</p>
+                                <a href="#" class="btn-secondary">View Details</a>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('Error loading laboratories:', error);
+            }
+        }
+
+        // Load data on page load
+        loadSchedules();
+        loadLaboratories();
+    </script>
+</body>
+</html>
