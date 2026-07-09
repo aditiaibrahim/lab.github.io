@@ -17,7 +17,7 @@
 ```
 nama: Administrator
 email: admin@nusaputra.ac.id
-password: $2a$10$gawEHvO645XbtYAhtyuKZOCMvVWxI1er71ZO7eOkTzaL6VbMZkSQO
+password: $2a$10$QFfOxY7xBQD0Y/eCCVdSfODV8UTi6shrM9UI0t5w0Th63bja6etl6
 role: admin
 status: approved
 npm_nidn: (leave empty)
@@ -43,7 +43,7 @@ The admin user is now created! You can login with:
 
 ```sql
 INSERT INTO users (nama, email, password, role, status) VALUES
-('Administrator', 'admin@nusaputra.ac.id', '$2a$10$gawEHvO645XbtYAhtyuKZOCMvVWxI1er71ZO7eOkTzaL6VbMZkSQO', 'admin', 'approved');
+('Administrator', 'admin@nusaputra.ac.id', '$2a$10$QFfOxY7xBQD0Y/eCCVdSfODV8UTi6shrM9UI0t5w0Th63bja6etl6', 'admin', 'approved');
 ```
 
 ### Step 3: Click "Run"
@@ -77,7 +77,7 @@ async function createAdmin() {
       {
         nama: 'Administrator',
         email: 'admin@nusaputra.ac.id',
-        password: '$2a$10$gawEHvO645XbtYAhtyuKZOCMvVWxI1er71ZO7eOkTzaL6VbMZkSQO',
+      password: '$2a$10$QFfOxY7xBQD0Y/eCCVdSfODV8UTi6shrM9UI0t5w0Th63bja6etl6',
         role: 'admin',
         status: 'approved'
       }
@@ -119,7 +119,7 @@ Then run: `node create-admin-direct.js`
 → Check your internet connection or try again later. Supabase might be temporarily unavailable.
 
 **Login still fails after creating admin**
-→ Make sure the password hash is correct. Use the hash provided above: `$2a$10$gawEHvO645XbtYAhtyuKZOCMvVWxI1er71ZO7eOkTzaL6VbMZkSQO`
+→ Make sure the password hash is correct. Use the hash provided above: `$2a$10$QFfOxY7xBQD0Y/eCCVdSfODV8UTi6shrM9UI0t5w0Th63bja6etl6`
 </parameter>
 <task_progress>
 - [x] Set up project structure and folders

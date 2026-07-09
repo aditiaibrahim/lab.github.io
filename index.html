@@ -545,7 +545,7 @@
         // Load schedules
         async function loadSchedules() {
             try {
-                const response = await fetch('http://localhost:3000/api/schedules');
+                const response = await fetch('/api/schedules');
                 const schedules = await response.json();
                 const tbody = document.getElementById('scheduleTable');
                 
@@ -568,7 +568,7 @@
         // Load laboratories
         async function loadLaboratories() {
             try {
-                const response = await fetch('http://localhost:3000/api/laboratories');
+                const response = await fetch('/api/laboratories');
                 const labs = await response.json();
                 const labGrid = document.getElementById('labGrid');
                 

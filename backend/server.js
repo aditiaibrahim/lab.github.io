@@ -15,22 +15,65 @@ app.use(express.json());
 app.use(express.static('../'));
 
 // Database connection
-const db = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME
-});
+let db;
+let dbConnected = false;
 
-db.connect((err) => {
-  if (err) {
-    console.error('⚠️  Database connection error:', err.message);
-    console.log('⚠️  Server running without database. Please start MySQL and restart the server.');
-    console.log('⚠️  Frontend pages will still be accessible at http://localhost:3000');
-  } else {
-    console.log('✅ Connected to MySQL database');
+if (process.env.DB_HOST && process.env.DB_USER && process.env.DB_NAME) {
+  db = mysql.createConnection({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME
+  });
+
+  db.connect((err) => {
+    if (err) {
+      console.error('⚠️  Database connection error:', err.message);
+      console.log('⚠️  Server running without database. Please start MySQL and configure .env file.');
+      console.log('⚠️  Frontend pages will still be accessible at http://localhost:' + PORT);
+      dbConnected = false;
+    } else {
+      console.log('✅ Connected to MySQL database');
+      dbConnected = true;
+    }
+  });
+
+  // Handle database disconnection
+  db.on('error', (err) => {
+    console.error('Database error:', err.message);
+    if (err.code === 'PROTOCOL_CONNECTION_LOST') {
+      console.log('⚠️  Database connection lost. Attempting to reconnect...');
+      dbConnected = false;
+      setTimeout(() => {
+        if (process.env.DB_HOST) {
+          db.connect((connectErr) => {
+            if (connectErr) {
+              console.error('Reconnection failed:', connectErr.message);
+            } else {
+              console.log('✅ Reconnected to MySQL database');
+              dbConnected = true;
+            }
+          });
+        }
+      }, 5000);
+    }
+  });
+} else {
+  console.warn('⚠️  Database credentials not found in .env file.');
+  console.log('⚠️  Server running without database. Please configure database settings in backend/.env');
+  console.log('⚠️  Frontend pages will still be accessible at http://localhost:' + PORT);
+}
+
+// Database check middleware
+const checkDatabase = (req, res, next) => {
+  if (!db || !dbConnected) {
+    return res.status(503).json({ 
+      message: 'Database service unavailable. Please try again later or contact administrator.',
+      error: 'Database not connected'
+    });
   }
-});
+  next();
+};
 
 // Auth Middleware
 const authenticateToken = (req, res, next) => {
@@ -61,7 +104,7 @@ const requireAdmin = (req, res, next) => {
 // ==================== AUTH ROUTES ====================
 
 // Register
-app.post('/api/register', async (req, res) => {
+app.post('/api/register', checkDatabase, async (req, res) => {
   try {
     const { nama, email, password, role, npm_nidn } = req.body;
 
@@ -99,7 +142,7 @@ app.post('/api/register', async (req, res) => {
 });
 
 // Login
-app.post('/api/login', async (req, res) => {
+app.post('/api/login', checkDatabase, async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -150,7 +193,7 @@ app.post('/api/login', async (req, res) => {
 });
 
 // Get current user
-app.get('/api/me', authenticateToken, async (req, res) => {
+app.get('/api/me', authenticateToken, checkDatabase, async (req, res) => {
   try {
     const [users] = await db.promise().query(
       'SELECT id, nama, email, role, npm_nidn FROM users WHERE id = ?',
@@ -171,7 +214,7 @@ app.get('/api/me', authenticateToken, async (req, res) => {
 // ==================== ADMIN ROUTES ====================
 
 // Get all pending users
-app.get('/api/admin/users/pending', authenticateToken, requireAdmin, async (req, res) => {
+app.get('/api/admin/users/pending', authenticateToken, requireAdmin, checkDatabase, async (req, res) => {
   try {
     const [users] = await db.promise().query(
       'SELECT id, nama, email, role, npm_nidn, status, created_at FROM users WHERE status = ?',
@@ -185,7 +228,7 @@ app.get('/api/admin/users/pending', authenticateToken, requireAdmin, async (req,
 });
 
 // Approve/Reject user
-app.put('/api/admin/users/:id/approve', authenticateToken, requireAdmin, async (req, res) => {
+app.put('/api/admin/users/:id/approve', authenticateToken, requireAdmin, checkDatabase, async (req, res) => {
   try {
     const { status } = req.body;
     const { id } = req.params;
@@ -203,7 +246,7 @@ app.put('/api/admin/users/:id/approve', authenticateToken, requireAdmin, async (
 });
 
 // Get all users
-app.get('/api/admin/users', authenticateToken, requireAdmin, async (req, res) => {
+app.get('/api/admin/users', authenticateToken, requireAdmin, checkDatabase, async (req, res) => {
   try {
     const [users] = await db.promise().query(
       'SELECT id, nama, email, role, npm_nidn, status, created_at FROM users'
@@ -216,7 +259,7 @@ app.get('/api/admin/users', authenticateToken, requireAdmin, async (req, res) =>
 });
 
 // Get statistics
-app.get('/api/admin/statistics', authenticateToken, requireAdmin, async (req, res) => {
+app.get('/api/admin/statistics', authenticateToken, requireAdmin, checkDatabase, async (req, res) => {
   try {
     const [userStats] = await db.promise().query(
       'SELECT role, COUNT(*) as count FROM users GROUP BY role'
@@ -244,7 +287,7 @@ app.get('/api/admin/statistics', authenticateToken, requireAdmin, async (req, re
 // ==================== LABORATORY ROUTES ====================
 
 // Get all laboratories
-app.get('/api/laboratories', async (req, res) => {
+app.get('/api/laboratories', checkDatabase, async (req, res) => {
   try {
     const [labs] = await db.promise().query(
       'SELECT * FROM laboratories WHERE status = ?',
@@ -258,7 +301,7 @@ app.get('/api/laboratories', async (req, res) => {
 });
 
 // Get laboratory by ID
-app.get('/api/laboratories/:id', async (req, res) => {
+app.get('/api/laboratories/:id', checkDatabase, async (req, res) => {
   try {
     const [labs] = await db.promise().query(
       'SELECT * FROM laboratories WHERE id = ?',
@@ -277,7 +320,7 @@ app.get('/api/laboratories/:id', async (req, res) => {
 });
 
 // Create laboratory (Admin)
-app.post('/api/admin/laboratories', authenticateToken, requireAdmin, async (req, res) => {
+app.post('/api/admin/laboratories', authenticateToken, requireAdmin, checkDatabase, async (req, res) => {
   try {
     const { nama_lab, deskripsi, kapasitas, lokasi } = req.body;
 
@@ -294,7 +337,7 @@ app.post('/api/admin/laboratories', authenticateToken, requireAdmin, async (req,
 });
 
 // Update laboratory (Admin)
-app.put('/api/admin/laboratories/:id', authenticateToken, requireAdmin, async (req, res) => {
+app.put('/api/admin/laboratories/:id', authenticateToken, requireAdmin, checkDatabase, async (req, res) => {
   try {
     const { nama_lab, deskripsi, kapasitas, lokasi, status } = req.body;
 
@@ -311,7 +354,7 @@ app.put('/api/admin/laboratories/:id', authenticateToken, requireAdmin, async (r
 });
 
 // Delete laboratory (Admin)
-app.delete('/api/admin/laboratories/:id', authenticateToken, requireAdmin, async (req, res) => {
+app.delete('/api/admin/laboratories/:id', authenticateToken, requireAdmin, checkDatabase, async (req, res) => {
   try {
     await db.promise().query('DELETE FROM laboratories WHERE id = ?', [req.params.id]);
     res.json({ message: 'Laboratory deleted' });
@@ -324,7 +367,7 @@ app.delete('/api/admin/laboratories/:id', authenticateToken, requireAdmin, async
 // ==================== SCHEDULE ROUTES ====================
 
 // Get all schedules
-app.get('/api/schedules', async (req, res) => {
+app.get('/api/schedules', checkDatabase, async (req, res) => {
   try {
     const [schedules] = await db.promise().query(`
       SELECT s.*, l.nama_lab, u.nama as user_name 
@@ -341,7 +384,7 @@ app.get('/api/schedules', async (req, res) => {
 });
 
 // Get schedules by lab
-app.get('/api/schedules/lab/:labId', async (req, res) => {
+app.get('/api/schedules/lab/:labId', checkDatabase, async (req, res) => {
   try {
     const [schedules] = await db.promise().query(`
       SELECT s.*, u.nama as user_name 
@@ -358,7 +401,7 @@ app.get('/api/schedules/lab/:labId', async (req, res) => {
 });
 
 // Get my schedules (Dosen/Mahasiswa)
-app.get('/api/schedules/my', authenticateToken, async (req, res) => {
+app.get('/api/schedules/my', authenticateToken, checkDatabase, async (req, res) => {
   try {
     const [schedules] = await db.promise().query(`
       SELECT s.*, l.nama_lab 
@@ -375,7 +418,7 @@ app.get('/api/schedules/my', authenticateToken, async (req, res) => {
 });
 
 // Create schedule (Dosen)
-app.post('/api/schedules', authenticateToken, async (req, res) => {
+app.post('/api/schedules', authenticateToken, checkDatabase, async (req, res) => {
   try {
     const { lab_id, mata_kuliah, time_start, time_finish, tanggal } = req.body;
 
@@ -392,7 +435,7 @@ app.post('/api/schedules', authenticateToken, async (req, res) => {
 });
 
 // Approve/Reject schedule (Admin)
-app.put('/api/admin/schedules/:id/approve', authenticateToken, requireAdmin, async (req, res) => {
+app.put('/api/admin/schedules/:id/approve', authenticateToken, requireAdmin, checkDatabase, async (req, res) => {
   try {
     const { status } = req.body;
 
@@ -411,7 +454,7 @@ app.put('/api/admin/schedules/:id/approve', authenticateToken, requireAdmin, asy
 // ==================== EQUIPMENT ROUTES ====================
 
 // Get all equipment
-app.get('/api/equipment', async (req, res) => {
+app.get('/api/equipment', checkDatabase, async (req, res) => {
   try {
     const [equipment] = await db.promise().query(`
       SELECT e.*, l.nama_lab 
@@ -427,7 +470,7 @@ app.get('/api/equipment', async (req, res) => {
 });
 
 // Get equipment by ID
-app.get('/api/equipment/:id', async (req, res) => {
+app.get('/api/equipment/:id', checkDatabase, async (req, res) => {
   try {
     const [equipment] = await db.promise().query(
       'SELECT * FROM equipment WHERE id = ?',
@@ -446,7 +489,7 @@ app.get('/api/equipment/:id', async (req, res) => {
 });
 
 // Create equipment (Admin)
-app.post('/api/admin/equipment', authenticateToken, requireAdmin, async (req, res) => {
+app.post('/api/admin/equipment', authenticateToken, requireAdmin, checkDatabase, async (req, res) => {
   try {
     const { nama_barang, deskripsi, jumlah_total, lab_id } = req.body;
 
@@ -465,7 +508,7 @@ app.post('/api/admin/equipment', authenticateToken, requireAdmin, async (req, re
 // ==================== PEMINJAMAN ROUTES ====================
 
 // Create peminjaman (Dosen/Mahasiswa)
-app.post('/api/peminjaman', authenticateToken, async (req, res) => {
+app.post('/api/peminjaman', authenticateToken, checkDatabase, async (req, res) => {
   try {
     const { equipment_id, jumlah_pinjam, tanggal_pinjam, tanggal_kembali, keperluan } = req.body;
 
@@ -496,7 +539,7 @@ app.post('/api/peminjaman', authenticateToken, async (req, res) => {
 });
 
 // Get my peminjaman
-app.get('/api/peminjaman/my', authenticateToken, async (req, res) => {
+app.get('/api/peminjaman/my', authenticateToken, checkDatabase, async (req, res) => {
   try {
     const [peminjaman] = await db.promise().query(`
       SELECT p.*, e.nama_barang 
@@ -513,7 +556,7 @@ app.get('/api/peminjaman/my', authenticateToken, async (req, res) => {
 });
 
 // Get all peminjaman (Admin)
-app.get('/api/admin/peminjaman', authenticateToken, requireAdmin, async (req, res) => {
+app.get('/api/admin/peminjaman', authenticateToken, requireAdmin, checkDatabase, async (req, res) => {
   try {
     const [peminjaman] = await db.promise().query(`
       SELECT p.*, e.nama_barang, u.nama as user_name 
@@ -530,7 +573,7 @@ app.get('/api/admin/peminjaman', authenticateToken, requireAdmin, async (req, re
 });
 
 // Approve/Reject peminjaman (Admin)
-app.put('/api/admin/peminjaman/:id/approve', authenticateToken, requireAdmin, async (req, res) => {
+app.put('/api/admin/peminjaman/:id/approve', authenticateToken, requireAdmin, checkDatabase, async (req, res) => {
   try {
     const { status, catatan_admin } = req.body;
     const { id } = req.params;

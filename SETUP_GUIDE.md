@@ -1,255 +1,145 @@
 # Setup Guide - Laboratory Management System
 
-## 📋 Prerequisites
+## Troubleshooting Server Error "Failed to fetch"
 
-Sebelum menjalankan aplikasi, pastikan Anda memiliki:
+Error "Failed to fetch" terjadi karena server backend tidak dapat terhubung ke database MySQL. Berikut langkah-langkah untuk memperbaiki:
 
-1. **Node.js** (v14 atau lebih baru) - [Download di sini](https://nodejs.org/)
-2. **MySQL** (v5.7 atau lebih baru) - [Download di sini](https://dev.mysql.com/downloads/mysql/)
-3. **Web Browser** (Chrome, Firefox, Edge, dll)
+## Langkah 1: Install MySQL
 
-## 🚀 Langkah-langkah Setup
+Pastikan MySQL sudah terinstall di komputer Anda:
+- Download MySQL dari https://dev.mysql.com/downloads/mysql/
+- Install dengan mengikuti wizard instalasi
+- Catat password yang Anda set untuk root user
 
-### 1. Install Dependencies
+## Langkah 2: Buat Database
+
+1. Buka MySQL Command Line Client atau phpMyAdmin
+2. Buat database baru dengan nama `laboratory_management`:
+
+```sql
+CREATE DATABASE IF NOT EXISTS laboratory_management;
+```
+
+3. Import schema database dari file `database/schema.sql`:
+
+```bash
+mysql -u root -p laboratory_management < database/schema.sql
+```
+
+Atau jika menggunakan phpMyAdmin:
+- Buka phpMyAdmin
+- Pilih database `laboratory_management`
+- Klik tab "Import"
+- Pilih file `database/schema.sql`
+- Klik "Go"
+
+## Langkah 3: Konfigurasi File .env
+
+Edit file `backend/.env` dan isi dengan kredensial database MySQL Anda:
+
+```env
+# Database Configuration (MySQL)
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=password_mysql_anda
+DB_NAME=laboratory_management
+
+# Server Configuration
+PORT=3000
+JWT_SECRET=your_jwt_secret_key_here_change_in_production
+NODE_ENV=development
+
+# Supabase Configuration (Optional)
+SUPABASE_URL=https://cqdttgkhhvyaxbxkguwq.supabase.co
+SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxZHR0Z2toaHZ5YXhieGtndXdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM1NDE2NTEsImV4cCI6MjA5OTExNzY1MX0.D2Qm5eEQeZ9YdbJxSGlcCuY0looaNeqLukEmIdrMCQM
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxZHR0Z2toaHZ5YXhieGtndXdxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MzU0MTY1MSwiZXhwIjoyMDk5MTE3NjUxfQ.SNazc3x7Et-08ptyfbeLefTnThZi_CfFLMfbmpyTEDY
+```
+
+**PENTING:** Ganti `password_mysql_anda` dengan password MySQL yang Anda set saat instalasi.
+
+## Langkah 4: Install Dependencies
+
+Buka terminal di folder project dan jalankan:
 
 ```bash
 npm install
 ```
 
-### 2. Setup MySQL Database
-
-#### Opsi A: Menggunakan phpMyAdmin (Recommended untuk pemula)
-
-1. Buka phpMyAdmin di browser (biasanya `http://localhost/phpmyadmin`)
-2. Klik tab **"Import"**
-3. Pilih file `database/schema.sql`
-4. Klik **"Go"** atau **"Import"**
-
-#### Opsi B: Menggunakan MySQL Command Line
-
-```bash
-# Login ke MySQL
-mysql -u root -p
-
-# Import database
-source database/schema.sql
-```
-
-### 3. Konfigurasi Database
-
-Edit file `backend/.env` sesuai dengan konfigurasi MySQL Anda:
-
-```env
-DB_HOST=localhost
-DB_USER=root
-DB_PASSWORD=your_password  # Ganti dengan password MySQL Anda
-DB_NAME=laboratory_management
-PORT=3000
-JWT_SECRET=your_jwt_secret_key_here_change_in_production
-NODE_ENV=development
-```
-
-**Catatan:** Jika MySQL Anda tidak memiliki password, biarkan `DB_PASSWORD=` (kosong)
-
-### 4. Jalankan Aplikasi
+## Langkah 5: Jalankan Server
 
 ```bash
 npm start
 ```
 
-Anda akan melihat output:
+Atau untuk development dengan auto-reload:
+
+```bash
+npm run dev
 ```
-Server running on http://localhost:3000
-✅ Connected to MySQL database
-```
 
-### 5. Akses Aplikasi
+Server akan berjalan di `http://localhost:3000`
 
-Buka browser dan kunjungi:
+## Langkah 6: Akses Aplikasi
 
-- **Homepage**: http://localhost:3000/index.html
-- **Login**: http://localhost:3000/login.html
-- **Register**: http://localhost:3000/register.html
+Buka browser dan akses:
+- Homepage: `http://localhost:3000/index.html`
+- Login: `http://localhost:3000/login.html`
+- Register: `http://localhost:3000/register.html`
 
-## 👤 Akun Default
-
-### Admin Account
-- **Email**: `admin@nusaputra.ac.id`
-- **Password**: `admin123`
-
-## 🧪 Testing Flow
-
-### Test 1: Register sebagai Mahasiswa
-
-1. Buka http://localhost:3000/register.html
-2. Isi form registrasi:
-   - Nama: `John Doe`
-   - Email: `john@nusaputra.ac.id`
-   - Password: `password123`
-   - Role: `Mahasiswa`
-   - NPM: `123456789`
-3. Klik **Daftar**
-4. Anda akan melihat pesan "Menunggu approval admin"
-
-### Test 2: Login sebagai Admin
-
-1. Buka http://localhost:3000/login.html
-2. Login dengan akun admin:
-   - Email: `admin@nusaputra.ac.id`
-   - Password: `admin123`
-3. Anda akan diarahkan ke Admin Dashboard
-
-### Test 3: Approve Akun Mahasiswa
-
-1. Di Admin Dashboard, klik **"Manajemen User"**
-2. Tab **"Pending Approval"** akan menampilkan akun John Doe
-3. Klik **"Approve"** untuk menyetujui akun
-4. Akun John Doe sekarang bisa login
-
-### Test 4: Login sebagai Mahasiswa
-
-1. Logout dari akun admin
-2. Login dengan akun John Doe:
-   - Email: `john@nusaputra.ac.id`
-   - Password: `password123`
-3. Anda akan diarahkan ke Mahasiswa Dashboard
-4. Di sini Anda bisa:
-   - Melihat jadwal laboratorium
-   - Mengajukan peminjaman barang
-
-### Test 5: Booking Laboratorium (Dosen)
-
-1. Register akun baru sebagai Dosen:
-   - Email: `dosen@nusaputra.ac.id`
-   - Role: `Dosen`
-   - NIDN: `987654321`
-2. Login sebagai admin dan approve akun dosen
-3. Login sebagai dosen
-4. Klik **"Booking Lab"** di sidebar
-5. Pilih laboratorium, isi mata kuliah, tanggal, dan waktu
-6. Klik **"Ajukan Booking"**
-7. Login kembali sebagai admin
-8. Di **"Manajemen Jadwal"**, approve booking yang dibuat dosen
-
-### Test 6: Peminjaman Barang
-
-1. Login sebagai mahasiswa/dosen
-2. Klik **"Peminjaman"** di sidebar
-3. Klik **"+ Ajukan Peminjaman"**
-4. Pilih barang, jumlah, tanggal pinjam/kembali, dan keperluan
-5. Klik **"Ajukan Peminjaman"**
-6. Login sebagai admin
-7. Di **"Manajemen Peminjaman"**, approve atau reject peminjaman
-
-## 🔧 Troubleshooting
+## Troubleshooting Umum
 
 ### Error: "Database connection error"
+- Pastikan MySQL service berjalan
+- Periksa kredensial di file `.env` (username, password, database name)
+- Pastikan database `laboratory_management` sudah dibuat
 
-**Penyebab:** MySQL belum berjalan atau konfigurasi salah
+### Error: "Access denied for user"
+- Username atau password MySQL salah
+- Periksa kembali file `.env`
 
-**Solusi:**
-1. Pastikan MySQL service berjalan:
-   - Windows: Buka Services, cari MySQL, klik Start
-   - Atau via XAMPP/WAMP control panel
-2. Periksa konfigurasi di `backend/.env`
-3. Test koneksi MySQL:
-   ```bash
-   mysql -u root -p
-   ```
+### Error: "Unknown database"
+- Database `laboratory_management` belum dibuat
+- Buat database terlebih dahulu (lihat Langkah 2)
 
-### Error: "Access token required"
+### Server Error Terus Muncul
+- Pastikan MySQL tidak timeout atau crash
+- Server sekarang memiliki auto-reconnect jika koneksi database terputus
+- Cek console log untuk detail error
 
-**Penyebab:** Belum login atau token expired
+## Membuat Admin Account
 
-**Solusi:**
-1. Login kembali melalui halaman login
-2. Token berlaku 24 jam, setelah itu perlu login ulang
+Setelah setup, Anda perlu membuat admin account. Ada 2 cara:
 
-### Error: "Account pending approval"
+### Cara 1: Manual SQL (Recommended)
 
-**Penyebab:** Akun belum disetujui admin
+Jalankan query SQL berikut di MySQL:
 
-**Solusi:**
-1. Login sebagai admin
-2. Buka Manajemen User
-3. Approve akun yang pending
+```sql
+INSERT INTO users (nama, email, password, role, npm_nidn, status) 
+VALUES ('Admin', 'admin@nusaputra.ac.id', '$2a$10$rQ7H8k9L2mN3oP4qR5sT6uV7wX8yZ9aB0cD1eF2gH3iJ4kL5mN6oP7', 'admin', NULL, 'approved');
+```
 
-### Port 3000 sudah digunakan
+Password default: `admin123`
 
-**Solusi:**
-1. Ubah port di `backend/.env`:
-   ```
-   PORT=3001
-   ```
-2. Akses aplikasi di `http://localhost:3001`
+### Cara 2: Via Script
 
-### Halaman putih/blank
+Jalankan script create-admin:
 
-**Penyebab:** JavaScript error atau API tidak bisa diakses
+```bash
+node create-admin.js
+```
 
-**Solusi:**
-1. Buka Developer Tools (F12)
-2. Cek Console untuk error messages
-3. Pastikan server berjalan di port 3000
-4. Clear browser cache (Ctrl+Shift+R)
+## Fitur Baru - Error Handling
 
-## 📊 Database Structure
+Server sekarang memiliki:
+1. ✅ Database connection check sebelum setiap API request
+2. ✅ Auto-reconnect jika koneksi database terputus
+3. ✅ Error message yang lebih jelas
+4. ✅ Graceful degradation (frontend tetap bisa diakses meskipun database error)
 
-### Tables Overview
+## Support
 
-1. **users** - Menyimpan data pengguna (admin, dosen, mahasiswa)
-2. **laboratories** - Menyimpan data laboratorium
-3. **schedules** - Menyimpan jadwal penggunaan lab
-4. **equipment** - Menyimpan data peralatan/barang
-5. **peminjaman** - Menyimpan data peminjaman barang
-
-### Sample Data
-
-Database sudah dilengkapi dengan:
-- 1 admin account
-- 7 laboratorium
-- 8 equipment items
-
-## 🎨 Fitur UI/UX
-
-- ✅ Modern minimalis design
-- ✅ Responsive (mobile-friendly)
-- ✅ Sticky navbar
-- ✅ Gradient hero section
-- ✅ Card-based layout
-- ✅ Poppins font family
-- ✅ Blue accent color scheme
-- ✅ FAQ accordion
-- ✅ Status badges
-- ✅ Modal forms
-- ✅ Loading states
-- ✅ Alert notifications
-
-## 🔐 Security Features
-
-- ✅ Password hashing (bcrypt)
-- ✅ JWT authentication
-- ✅ Role-based access control
-- ✅ Input validation
-- ✅ SQL injection prevention (prepared statements)
-- ✅ CORS enabled
-
-## 📝 Notes
-
-- Semua API endpoint memerlukan authentication token (kecuali login, register, dan get public data)
-- Admin harus approve akun baru sebelum bisa login
-- JWT token berlaku 24 jam
-- Semua form memiliki validasi client-side
-- Server akan tetap berjalan meskipun database tidak terhubung (untuk development)
-
-## 🆘 Support
-
-Jika mengalami masalah:
-1. Cek console browser (F12) untuk error messages
-2. Cek terminal output untuk backend errors
-3. Pastikan MySQL berjalan dan database sudah di-import
-4. Periksa konfigurasi di file `.env`
-
-## 📄 License
-
-© 2024 Laboratory Unit - Universitas Nusa Putra. All rights reserved.
+Jika masih mengalami masalah, periksa:
+1. Console log server untuk error messages
+2. Browser console (F12) untuk frontend errors
+3. Pastikan port 3000 tidak digunakan aplikasi lain

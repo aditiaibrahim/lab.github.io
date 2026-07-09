@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS peminjaman (
 
 -- Insert default admin user (password: admin123)
 INSERT INTO users (nama, email, password, role, status) VALUES
-('Administrator', 'admin@nusaputra.ac.id', '$2a$10$rQ7H8p9Y2Z3X4C5V6B7N8M9O0P1Q2R3S4T5U6V7W8X9Y0Z1A2B3C4D5E6F7G8H', 'admin', 'approved');
+('Administrator', 'admin@nusaputra.ac.id', '$2a$10$QFfOxY7xBQD0Y/eCCVdSfODV8UTi6shrM9UI0t5w0Th63bja6etl6', 'admin', 'approved');
 
 -- Insert sample laboratories
 INSERT INTO laboratories (nama_lab, deskripsi, kapasitas, lokasi) VALUES

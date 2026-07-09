@@ -10,6 +10,21 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key';
 
+// Get local IP address
+const os = require('os');
+const networkInterfaces = os.networkInterfaces();
+let localIP = 'localhost';
+
+for (const interfaceName in networkInterfaces) {
+  const interfaces = networkInterfaces[interfaceName];
+  for (const iface of interfaces) {
+    if (iface.family === 'IPv4' && !iface.internal) {
+      localIP = iface.address;
+      break;
+    }
+  }
+}
+
 // Debug: Check if environment variables are loaded
 console.log('SUPABASE_URL:', process.env.SUPABASE_URL ? 'Loaded ✓' : 'NOT FOUND ✗');
 console.log('SUPABASE_ANON_KEY:', process.env.SUPABASE_ANON_KEY ? 'Loaded ✓' : 'NOT FOUND ✗');
@@ -27,7 +42,11 @@ const supabase = createClient(
 );
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: '*', // Allow all origins for development
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 app.use(express.static('../'));
 
@@ -760,7 +779,12 @@ app.put('/api/admin/peminjaman/:id/approve', authenticateToken, requireAdmin, as
 });
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-  console.log(`Using Supabase database`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log('\n========================================');
+  console.log('✅ Server is running!');
+  console.log('========================================');
+  console.log(`📱 Local access: http://localhost:${PORT}`);
+  console.log(`🌐 Network access: http://${localIP}:${PORT}`);
+  console.log(`📱 Mobile: Use the Network access URL above`);
+  console.log('========================================\n');
 });
