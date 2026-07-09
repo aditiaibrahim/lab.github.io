@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mahasiswa Dashboard - Laboratory Unit</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f8f9fa;
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: #1e3a8a;
+            color: white;
+            padding: 2rem 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.3rem;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            color: white;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-menu i {
+            margin-right: 1rem;
+            width: 20px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 2rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: #1e3a8a;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-info i {
+            font-size: 1.5rem;
+            color: #1e3a8a;
+        }
+
+        .btn-logout {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            transition: background 0.3s;
+        }
+
+        .btn-logout:hover {
+            background: #dc2626;
+        }
+
+        /* Content Sections */
+        .content-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-header h2 {
+            color: #1e3a8a;
+        }
+
+        .btn-primary {
+            background: #1e3a8a;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            text-decoration: none;
+            display: inline-block;
+            transition: background 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: #1e40af;
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #1e3a8a;
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        tr:hover {
+            background: #f9fafb;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-approved {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-rejected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h2 {
+            color: #1e3a8a;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #1e3a8a;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 1rem;
+            background: #1e3a8a;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .btn-submit:hover {
+            background: #1e40af;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            position: relative;
+        }
+
+        .tab.active {
+            color: #1e3a8a;
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #1e3a8a;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                position: relative;
+                height: auto;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .dashboard-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-user-graduate"></i> Mahasiswa Panel</h2>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="#" class="active" onclick="showSection('dashboard')"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="#" onclick="showSection('jadwal')"><i class="fas fa-calendar"></i> Jadwal Lab</a></li>
+                <li><a href="#" onclick="showSection('peminjaman')"><i class="fas fa-boxes"></i> Peminjaman</a></li>
+                <li><a href="/index.html"><i class="fas fa-home"></i> Kembali ke Home</a></li>
+                <li><a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="header">
+                <h1>Dashboard Mahasiswa</h1>
+                <div class="user-info">
+                    <span id="userName">Mahasiswa</span>
+                    <button class="btn-logout" onclick="logout()">Logout</button>
+                </div>
+            </div>
+
+            <!-- Dashboard Section -->
+            <div id="dashboardSection" class="content-section">
+                <h2 id="welcomeMessage">Selamat Datang!</h2>
+                <p style="margin-top: 1rem; color: #666;">Lihat jadwal laboratorium dan ajukan peminjaman peralatan.</p>
+            </div>
+
+            <!-- Jadwal Section -->
+            <div id="jadwalSection" class="content-section" style="display: none;">
+                <div class="section-header">
+                    <h2>Jadwal Laboratorium</h2>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Laboratorium</th>
+                                <th>Mata Kuliah</th>
+                                <th>Dosen</th>
+                                <th>Waktu</th>
+                                <th>Tanggal</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="jadwalTable">
+                            <tr><td colspan="7" style="text-align: center;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Peminjaman Section -->
+            <div id="peminjamanSection" class="content-section" style="display: none;">
+                <div class="section-header">
+                    <h2>Peminjaman Barang</h2>
+                    <button class="btn-primary" onclick="openPeminjamanModal()">+ Ajukan Peminjaman</button>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Barang</th>
+                                <th>Jumlah</th>
+                                <th>Tanggal Pinjam</th>
+                                <th>Tanggal Kembali</th>
+                                <th>Keperluan</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="peminjamanTable">
+                            <tr><td colspan="7" style="text-align: center;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Peminjaman Modal -->
+    <div id="peminjamanModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Ajukan Peminjaman</h2>
+                <button class="close-modal" onclick="closePeminjamanModal()">&times;</button>
+            </div>
+            <form id="peminjamanForm">
+                <div class="form-group">
+                    <label for="equipment_id">Pilih Barang</label>
+                    <select id="equipment_id" name="equipment_id" required>
+                        <option value="">Pilih Barang</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="jumlah_pinjam">Jumlah Pinjam</label>
+                    <input type="number" id="jumlah_pinjam" name="jumlah_pinjam" required min="1" value="1">
+                </div>
+
+                <div class="form-group">
+                    <label for="tanggal_pinjam">Tanggal Pinjam</label>
+                    <input type="date" id="tanggal_pinjam" name="tanggal_pinjam" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="tanggal_kembali">Tanggal Kembali</label>
+                    <input type="date" id="tanggal_kembali" name="tanggal_kembali" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="keperluan">Keperluan</label>
+                    <input type="text" id="keperluan" name="keperluan" required placeholder="Contoh: Praktikum Pemrograman">
+                </div>
+
+                <button type="submit" class="btn-submit">Ajukan Peminjaman</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api';
+        let token = localStorage.getItem('token');
+        let currentUser = JSON.parse(localStorage.getItem('user'));
+
+        // Check authentication
+        if (!token || currentUser?.role !== 'mahasiswa') {
+            window.location.href = 'login.html';
+        }
+
+        // Load user info
+        document.getElementById('userName').textContent = currentUser?.nama || 'Mahasiswa';
+        document.getElementById('welcomeMessage').textContent = `Selamat Datang, ${currentUser?.nama || 'Mahasiswa'}!`;
+
+        // Show section
+        function showSection(section) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(sec => {
+                sec.style.display = 'none';
+            });
+
+            // Show selected section
+            document.getElementById(section + 'Section').style.display = 'block';
+
+            // Update active menu
+            document.querySelectorAll('.sidebar-menu a').forEach(link => {
+                link.classList.remove('active');
+            });
+            event.target.closest('a').classList.add('active');
+
+            // Load data based on section
+            if (section === 'dashboard') {
+                // Dashboard content
+            }
+            if (section === 'jadwal') loadJadwal();
+            if (section === 'peminjaman') loadMyPeminjaman();
+        }
+
+        // Load jadwal laboratorium
+        async function loadJadwal() {
+            try {
+                const response = await fetch(`${API_URL}/schedules`);
+                const schedules = await response.json();
+
+                const table = document.getElementById('jadwalTable');
+                if (schedules.length === 0) {
+                    table.innerHTML = '<tr><td colspan="7" style="text-align: center;">Belum ada jadwal</td></tr>';
+                } else {
+                    table.innerHTML = schedules.map((schedule, index) => `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${schedule.nama_lab}</td>
+                            <td>${schedule.mata_kuliah}</td>
+                            <td>${schedule.user_name}</td>
+                            <td>${schedule.time_start} - ${schedule.time_finish}</td>
+                            <td>${new Date(schedule.tanggal).toLocaleDateString('id-ID')}</td>
+                            <td><span class="status-badge status-${schedule.status}">${schedule.status}</span></td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading jadwal:', error);
+            }
+        }
+
+        // Load my peminjaman
+        async function loadMyPeminjaman() {
+            try {
+                const response = await fetch(`${API_URL}/peminjaman/my`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const peminjaman = await response.json();
+
+                const table = document.getElementById('peminjamanTable');
+                if (peminjaman.length === 0) {
+                    table.innerHTML = '<tr><td colspan="7" style="text-align: center;">Belum ada peminjaman</td></tr>';
+                } else {
+                    table.innerHTML = peminjaman.map((item, index) => `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${item.nama_barang}</td>
+                            <td>${item.jumlah_pinjam}</td>
+                            <td>${new Date(item.tanggal_pinjam).toLocaleDateString('id-ID')}</td>
+                            <td>${new Date(item.tanggal_kembali).toLocaleDateString('id-ID')}</td>
+                            <td>${item.keperluan}</td>
+                            <td><span class="status-badge status-${item.status}">${item.status}</span></td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading peminjaman:', error);
+            }
+        }
+
+        // Open peminjaman modal
+        async function openPeminjamanModal() {
+            try {
+                const response = await fetch(`${API_URL}/equipment`);
+                const equipment = await response.json();
+
+                const select = document.getElementById('equipment_id');
+                select.innerHTML = '<option value="">Pilih Barang</option>' +
+                    equipment.map(eq => `<option value="${eq.id}">${eq.nama_barang} (Tersedia: ${eq.jumlah_tersedia})</option>`).join('');
+
+                document.getElementById('peminjamanModal').classList.add('active');
+            } catch (error) {
+                console.error('Error loading equipment:', error);
+                alert('Gagal memuat data equipment');
+            }
+        }
+
+        // Close peminjaman modal
+        function closePeminjamanModal() {
+            document.getElementById('peminjamanModal').classList.remove('active');
+        }
+
+        // Peminjaman form submission
+        document.getElementById('peminjamanForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = {
+                equipment_id: document.getElementById('equipment_id').value,
+                jumlah_pinjam: parseInt(document.getElementById('jumlah_pinjam').value),
+                tanggal_pinjam: document.getElementById('tanggal_pinjam').value,
+                tanggal_kembali: document.getElementById('tanggal_kembali').value,
+                keperluan: document.getElementById('keperluan').value
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/peminjaman`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    alert('Peminjaman berhasil diajukan!');
+                    closePeminjamanModal();
+                    document.getElementById('peminjamanForm').reset();
+                    loadMyPeminjaman();
+                } else {
+                    const data = await response.json();
+                    alert(data.message || 'Gagal mengajukan peminjaman');
+                }
+            } catch (error) {
+                console.error('Error creating peminjaman:', error);
+                alert('Server error');
+            }
+        });
+
+        // Logout
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/login.html';
+        }
+
+        // Load initial data
+        loadJadwal();
+    </script>
+</body>
+</html>
